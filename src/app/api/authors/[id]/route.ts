@@ -3,41 +3,31 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
     const author = await prisma.author.findUnique({
       where: { id },
       include: {
-        books: {
-          orderBy: { publishedYear: 'desc' }
-        },
-        _count: {
-          select: { books: true }
-        }
+        books: { orderBy: { publishedYear: 'desc' } },
+        _count: { select: { books: true } }
       }
     });
 
     if (!author) {
-      return NextResponse.json(
-        { error: 'Autor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Autor no encontrado' }, { status: 404 });
     }
 
     return NextResponse.json(author);
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Error al obtener autor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al obtener autor' }, { status: 500 });
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -47,10 +37,7 @@ export async function PUT(
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        return NextResponse.json(
-          { error: 'Email inválido' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
       }
     }
 
@@ -63,55 +50,33 @@ export async function PUT(
         nationality,
         birthYear: birthYear ? parseInt(birthYear) : null,
       },
-      include: {
-        books: true
-      }
+      include: { books: true }
     });
 
     return NextResponse.json(author);
   } catch (error: any) {
     if (error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Autor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Autor no encontrado' }, { status: 404 });
     }
     if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: 'El email ya está registrado' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'El email ya está registrado' }, { status: 409 });
     }
-    return NextResponse.json(
-      { error: 'Error al actualizar autor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al actualizar autor' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    await prisma.author.delete({
-      where: { id }
-    });
-
-    return NextResponse.json({
-      message: 'Autor eliminado correctamente'
-    });
+    await prisma.author.delete({ where: { id } });
+    return NextResponse.json({ message: 'Autor eliminado correctamente' });
   } catch (error: any) {
     if (error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Autor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Autor no encontrado' }, { status: 404 });
     }
-    return NextResponse.json(
-      { error: 'Error al eliminar autor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al eliminar autor' }, { status: 500 });
   }
 }

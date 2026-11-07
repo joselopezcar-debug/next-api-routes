@@ -3,19 +3,14 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const author = await prisma.author.findUnique({
-      where: { id }
-    });
+    const author = await prisma.author.findUnique({ where: { id } });
 
     if (!author) {
-      return NextResponse.json(
-        { error: 'Autor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Autor no encontrado' }, { status: 404 });
     }
 
     const books = await prisma.book.findMany({
@@ -24,17 +19,11 @@ export async function GET(
     });
 
     return NextResponse.json({
-      author: {
-        id: author.id,
-        name: author.name
-      },
+      author: { id: author.id, name: author.name },
       totalBooks: books.length,
       books
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Error al obtener libros del autor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al obtener libros del autor' }, { status: 500 });
   }
 }

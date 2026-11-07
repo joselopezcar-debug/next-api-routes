@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -13,24 +13,18 @@ export async function GET(
     });
 
     if (!book) {
-      return NextResponse.json(
-        { error: 'Libro no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Libro no encontrado' }, { status: 404 });
     }
 
     return NextResponse.json(book);
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Error al obtener libro' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al obtener libro' }, { status: 500 });
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -38,28 +32,17 @@ export async function PUT(
     const { title, description, isbn, publishedYear, genre, pages, authorId } = body;
 
     if (title && title.length < 3) {
-      return NextResponse.json(
-        { error: 'El título debe tener al menos 3 caracteres' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'El título debe tener al menos 3 caracteres' }, { status: 400 });
     }
 
     if (pages && pages < 1) {
-      return NextResponse.json(
-        { error: 'El número de páginas debe ser mayor a 0' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'El número de páginas debe ser mayor a 0' }, { status: 400 });
     }
 
     if (authorId) {
-      const authorExists = await prisma.author.findUnique({
-        where: { id: authorId }
-      });
+      const authorExists = await prisma.author.findUnique({ where: { id: authorId } });
       if (!authorExists) {
-        return NextResponse.json(
-          { error: 'El autor especificado no existe' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'El autor especificado no existe' }, { status: 404 });
       }
     }
 
@@ -80,45 +63,27 @@ export async function PUT(
     return NextResponse.json(book);
   } catch (error: any) {
     if (error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Libro no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Libro no encontrado' }, { status: 404 });
     }
     if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: 'El ISBN ya existe' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'El ISBN ya existe' }, { status: 409 });
     }
-    return NextResponse.json(
-      { error: 'Error al actualizar libro' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al actualizar libro' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    await prisma.book.delete({
-      where: { id }
-    });
-
+    await prisma.book.delete({ where: { id } });
     return NextResponse.json({ message: 'Libro eliminado correctamente' });
   } catch (error: any) {
     if (error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Libro no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Libro no encontrado' }, { status: 404 });
     }
-    return NextResponse.json(
-      { error: 'Error al eliminar libro' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al eliminar libro' }, { status: 500 });
   }
 }

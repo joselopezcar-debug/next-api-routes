@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -13,10 +13,7 @@ export async function GET(
     });
 
     if (!author) {
-      return NextResponse.json(
-        { error: 'Autor no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Autor no encontrado' }, { status: 404 });
     }
 
     const books = author.books;
@@ -74,10 +71,6 @@ export async function GET(
       shortestBook
     });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { error: 'Error al obtener las estadísticas del autor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al obtener las estadísticas del autor' }, { status: 500 });
   }
 }
