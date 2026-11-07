@@ -10,8 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 
-prisma.config.ts
-
 # testing
 /coverage
 
